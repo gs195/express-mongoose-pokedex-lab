@@ -1,7 +1,7 @@
-require('../models/pokemon.model');
-const mongoose = require('mongoose');
-const Pokemon = mongoose.model('pokemon');
-const { flattenObj } = require('../utils/objectHelper');
+require("../models/pokemon.model");
+const mongoose = require("mongoose");
+const Pokemon = mongoose.model("pokemon");
+const { flattenObj } = require("../utils/objectHelper");
 
 const findAll = async (req, res) => {
   const foundPokemon = await Pokemon.find();
@@ -9,20 +9,38 @@ const findAll = async (req, res) => {
 };
 
 const findOne = async (req, res, next) => {
-  res.sendStatus(501);
+  const foundOne = await Pokemon.findOne({ name: req.params.id }).catch(
+    err => {
+      err.message = `Could not find pokemon with name ${req.body.name.english}`;
+      next(err);
+    }
+  );
+  res.sendStatus(200);
+  return foundOne;
 };
 
 const createOne = async (req, res, next) => {
-  res.sendStatus(501);
+  const newPokemon = new Pokemon(req.body); //try catch here
+  await newPokemon.save().catch(err => {
+    err.message = `Could not create pokemon ${req.body.name.english}`;
+    next(err);
+  });
+  res.sendStatus(200);
 };
 
 const deleteOne = async (req, res, next) => {
-  res.sendStatus(501);
+  await Pokemon.findOneAndRemove(req.params.id).catch(err => {
+    err.message = `Could not delete pokemon with id ${req.params.id}`;
+    next(err);
+  });
+
+  res.sendStatus(200);
 };
 
 const updateOne = async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log("req.params is ", { id });
     const update = req.body;
 
     const updateFields = flattenObj(update);
@@ -39,5 +57,5 @@ module.exports = {
   findOne,
   createOne,
   deleteOne,
-  updateOne,
+  updateOne
 };

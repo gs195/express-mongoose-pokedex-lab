@@ -10,7 +10,7 @@ app.use('/pokemon', pokemonRoute);
 // ERROR HANDLER
 app.use((err, req, res, next) => {
   console.log('error', err);
-  res.sendStatus(500);
+  return res.sendStatus(500);
 });
 
 module.exports = app;

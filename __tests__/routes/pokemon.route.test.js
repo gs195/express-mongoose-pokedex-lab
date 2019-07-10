@@ -46,13 +46,60 @@ describe('Pokemon', () => {
       expect(response.body).toMatchObject(pokemonData);
     });
 
-    xit('/POST should create a pokemon', async () => {});
+    it('/POST should create a pokemon', async () => {;
+    const collection = db.collection("pokemons");
+    await collection.insertMany(pokemonData);
+    const newPokemon = {
+    id: 9000,
+    name: {
+      english: "Blastoise",
+      japanese: "カメックス",
+      chinese: "水箭龟"
+    },
+    type: ["Water"],
+    base: {
+      HP: 79,
+      Attack: 83,
+      Defense: 100,
+      SpAttack: 85,
+      SpDefence: 105,
+      Speed: 78
+    }
+  };
+    const response = await request(app)
+      .post(`/pokemon`)
+      .send(newPokemon)
+      .set("Content-Type", "application/json");
+    expect(response.status).toEqual(200);
+    const foundPokemon = await collection.findOne({ id: 9000 });
+    expect(foundPokemon).toMatchObject(newPokemon);
   });
 
   describe('/pokemon/:id', () => {
-    xit('/GET should a single pokemon', async () => {});
+    it('/GET should a single pokemon', async () => {
+    const pokemon = getPokemonData(0);
+    const collection = db.collection("pokemons");
+    await collection.insertMany(pokemonData);
 
-    xit('DELETE should remove data from database', async () => {});
+    const response = await request(app).get(`/pokemon/${pokemon.id}`);
+
+    expect(response.status).toEqual(200);
+    const foundPokemon = await collection.findOne({ id: pokemon.id });
+    expect(foundPokemon).toMatchObject(response.body);
+    });
+  });
+
+    it('DELETE should remove data from database', async () => {
+    const pokemon = getPokemonData(0);
+    const collection = db.collection("pokemons");
+    await collection.insertMany(pokemonData);
+
+    const response = await request(app).delete(`/pokemon/${pokemon.id}`);
+
+    expect(response.status).toEqual(200);
+    const deletedPokemon = await collection.findOne({ id: pokemon.id });
+    expect(deletedPokemon).toBeFalsy();
+    });
 
     it('/PUT should modify the data from database', async () => {
       const pokemon = getPokemonData(0);
