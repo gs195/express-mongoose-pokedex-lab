@@ -46,7 +46,7 @@ describe('Pokemon', () => {
       expect(response.body).toMatchObject(pokemonData);
     });
 
-    it('/POST should create a pokemon', async () => {;
+    it('/POST should create a pokemon', async () => {
     const collection = db.collection("pokemons");
     await collection.insertMany(pokemonData);
     const newPokemon = {
